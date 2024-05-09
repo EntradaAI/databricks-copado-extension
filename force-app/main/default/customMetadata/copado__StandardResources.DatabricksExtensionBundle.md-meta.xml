@@ -3,8 +3,8 @@
     <label>DatabricksExtensionBundle</label>
     <protected>false</protected>
     <values>
-        <field>copado__Entrada__c</field>
-        <value xsi:type="xsd:string">Copado</value>
+        <field>copado__Provider__c</field>
+        <value xsi:type="xsd:string">Entrada</value>
     </values>
     <values>
         <field>copado__DatabricksExtensionBundle__c</field>
