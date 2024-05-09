@@ -1,0 +1,111 @@
+{
+  "recordTypeMap": {},
+  "RecordSetBundles": [
+    {
+      "Records": [
+        {
+          "attributes": {
+            "type": "copado__JobTemplate__c",
+            "url": "/services/data/v60.0/sobjects/copado__JobTemplate__c/a0uan00000046q1AAA"
+          },
+          "copado__ApiName__c": "Promotion_Job_Template_1",
+          "copado__Type__c": "Custom",
+          "copado__Version__c": 1,
+          "Id": "a0uan00000046q1AAA",
+          "LastReferencedDate": "2024-04-18T02:28:28.000+0000",
+          "LastViewedDate": "2024-04-18T02:28:28.000+0000",
+          "Name": "Databricks Promote"
+        },
+        {
+          "attributes": {
+            "type": "copado__JobTemplate__c",
+            "url": "/services/data/v60.0/sobjects/copado__JobTemplate__c/a0uan00000046rdAAA"
+          },
+          "copado__ApiName__c": "Deployment_Job_Template_1",
+          "copado__Type__c": "Custom",
+          "copado__Version__c": 1,
+          "Id": "a0uan00000046rdAAA",
+          "LastReferencedDate": "2024-05-08T01:08:23.000+0000",
+          "LastViewedDate": "2024-05-08T01:08:23.000+0000",
+          "Name": "Databricks Deploy"
+        }
+      ],
+      "ObjectType": "copado__JobTemplate__c"
+    },
+    {
+      "Records": [
+        {
+          "attributes": {
+            "type": "copado__JobStep__c",
+            "url": "/services/data/v60.0/sobjects/copado__JobStep__c/a0tan000000x7qJAAQ"
+          },
+          "copado__ApiName__c": "Promotion_Job_Templace_1_Promote_1",
+          "copado__ConfigJson__c": "{\"functionName\":\"dbx_promote\",\"parameters\":[]}",
+          "copado__CustomType__c": "Function",
+          "copado__IsSkipped__c": false,
+          "copado__JobTemplate__c": "a0uan00000046q1AAA",
+          "copado__Order__c": 1,
+          "copado__Type__c": "Function",
+          "Id": "a0tan000000x7qJAAQ",
+          "Name": "Promote"
+        },
+        {
+          "attributes": {
+            "type": "copado__JobStep__c",
+            "url": "/services/data/v60.0/sobjects/copado__JobStep__c/a0tan000000x55LAAQ"
+          },
+          "copado__ApiName__c": "Deployment_Job_Template_1_Deploy_1",
+          "copado__ConfigJson__c": "{\"functionName\":\"dbx_deploy\",\"parameters\":[]}",
+          "copado__CustomType__c": "Function",
+          "copado__IsSkipped__c": false,
+          "copado__JobTemplate__c": "a0uan00000046rdAAA",
+          "copado__Order__c": 1,
+          "copado__Type__c": "Function",
+          "Id": "a0tan000000x55LAAQ",
+          "Name": "Deploy"
+        }
+      ],
+      "ObjectType": "copado__JobStep__c"
+    },
+    {
+      "Records": [
+        {
+          "attributes": {
+            "type": "copado__Function__c",
+            "url": "/services/data/v60.0/sobjects/copado__Function__c/a0lan000000U8GHAA0"
+          },
+          "copado__API_Name__c": "dbx_promote",
+          "copado__Image_Name__c": "copado-function-core:v1",
+          "copado__Options__c": "[ ]",
+          "copado__Parameters__c": "[ {\n  \"required\" : true,\n  \"name\" : \"promotion\",\n  \"defaultValue\" : \"{$Context.JobExecution__r.DataJson.promotionBranchName}\"\n}, {\n  \"name\" : \"merge_strategy\",\n  \"defaultValue\" : \"theirs\"\n}, {\n  \"required\" : true,\n  \"name\" : \"target_branch\",\n  \"defaultValue\" : \"{$Context.JobExecution__r.DataJson.destinationBranchName}\"\n}, {\n  \"name\" : \"tag\",\n  \"defaultValue\" : \"{$Context.JobExecution__r.Promotion__r.Release__r.Version__c}\"\n}, {\n  \"required\" : true,\n  \"name\" : \"user_stories\",\n  \"defaultValue\" : \"{$Context.JobExecution__r.DataJson.userStoryBranches}\"\n}, {\n  \"required\" : true,\n  \"name\" : \"git_json\",\n  \"defaultValue\" : \"{$Context.Repository.Credential}\"\n} ]",
+          "copado__Script__c": "git_depth=${git_depth:-100}  # set a default git depth of 100 commits\nmerge_strategy=${merge_strategy-theirs} # set default merge strategy to ours (only if unset)\nif [ -n \"$merge_strategy\" ]; then merge_strategy_option=(-X \"$merge_strategy\"); else merge_strategy_option=(); fi\n\necho \"promotion branch: $promotion\"\necho \"merge strategy: $merge_strategy\"\necho \"user stories: $user_stories\"\necho \"git_depth: $git_depth\"\ncopado --progress \"fetching $target_branch\"\ncopado-git-get --depth \"$git_depth\" \"$target_branch\"\ncopado-git-get --depth \"$git_depth\" --create \"$promotion\"\nbranches=$(echo \"$user_stories\" | jq -c -r '.[]')\nfor user_story in ${branches[@]}; do\n    echo \"merging $user_story\"\n    copado-git-get --depth \"$git_depth\" \"$user_story\"\n    git checkout \"$promotion\"\n    git merge \"${merge_strategy_option[@]}\" -m \"auto resolved $user_story win over $promotion\" \"$user_story\"\ndone\n\ncopado --progress \"pushing $promotion $tag\"\n\nif [ -n \"$tag\" ]; then\n    git tag \"$tag\"\n    git push --atomic origin \"$promotion\" \"$tag\"\nelse\n    echo \"no tag specified\"\n    git push origin \"$promotion\"\nfi",
+          "copado__Type__c": "Custom",
+          "copado__Worker_Size__c": "S",
+          "Id": "a0lan000000U8GHAA0",
+          "LastReferencedDate": "2024-05-06T02:45:42.000+0000",
+          "LastViewedDate": "2024-05-06T02:45:42.000+0000",
+          "Name": "Databricks Promote"
+        },
+        {
+          "attributes": {
+            "type": "copado__Function__c",
+            "url": "/services/data/v60.0/sobjects/copado__Function__c/a0lan000000U8HtAAK"
+          },
+          "copado__API_Name__c": "dbx_deploy",
+          "copado__Image_Name__c": "copado-function-core:v1",
+          "copado__Options__c": "[ ]",
+          "copado__Parameters__c": "[ {\n  \"required\" : true,\n  \"name\" : \"promotion\",\n  \"defaultValue\" : \"{$Context.JobExecution__r.DataJson.promotionBranchName}\"\n}, {\n  \"required\" : true,\n  \"name\" : \"target_branch\",\n  \"defaultValue\" : \"{$Context.JobExecution__r.DataJson.destinationBranchName}\"\n}, {\n  \"required\" : true,\n  \"name\" : \"git_json\",\n  \"defaultValue\" : \"{$Context.Repository.Credential}\"\n}, {\n  \"required\" : true,\n  \"name\" : \"env_vars\",\n  \"defaultValue\" : \"{$Destination.apex.EnvironmentVariables}\"\n}, {\n  \"required\" : true,\n  \"name\" : \"DATABRICKS_CLIENT_SECRET\",\n  \"defaultValue\" : \"{$Destination.Property.DATABRICKS_CLIENT_SECRET}\"\n}, {\n  \"name\" : \"url\",\n  \"defaultValue\" : \"{$Destination.Credential.Endpoint}\"\n}, {\n  \"name\" : \"GIT_TOKEN\",\n  \"defaultValue\" : \"{$Destination.Property.GIT_TOKEN}\"\n} ]",
+          "copado__Script__c": "#!/usr/bin/env python\n\nimport subprocess\nimport os\nimport json\n\ntarget_branch: str = os.environ[\"target_branch\"]\nprint(f\"Target branch for deployment: '{target_branch}'\")\n\ncli_install = \"\"\"# Note: we cannot assume we're running bash and use the set -euo pipefail approach.\nset -e\n\nVERSION=\"0.219.0\"\nFILE=\"databricks_cli_$VERSION\"\n\n# Include operating system in file name.\nOS=\"$(uname -s | cut -d '-' -f 1)\"\ncase \"$OS\" in\nLinux)\n    FILE=\"${FILE}_linux\"\n    TARGET=\"/tmp\"\n    ;;\nDarwin)\n    FILE=\"${FILE}_darwin\"\n    TARGET=\"/usr/local/bin\"\n    ;;\nMINGW64_NT)\n    FILE=\"${FILE}_windows\"\n    TARGET=\"/c/Windows\"\n    ;;\n*)\n    echo \"Unknown operating system: $OS\"\n    exit 1\n    ;;\nesac\n\n# Set target to ~/bin if DATABRICKS_RUNTIME_VERSION environment variable is set.\nif [ -n \"$DATABRICKS_RUNTIME_VERSION\" ]; then\n    # Set the installation target to ~/bin when run on DBR\n    TARGET=\"$HOME/bin\"\n\n    # Create the target directory if it does not exist\n    mkdir -p \"$TARGET\"\nfi\n\n# Include architecture in file name.\nARCH=\"$(uname -m)\"\ncase \"$ARCH\" in\ni386)\n    FILE=\"${FILE}_386\"\n    ;;\nx86_64)\n    FILE=\"${FILE}_amd64\"\n    ;;\narm)\n    FILE=\"${FILE}_arm\"\n    ;;\narm64|aarch64)\n    FILE=\"${FILE}_arm64\"\n    ;;\n*)\n    echo \"Unknown architecture: $ARCH\"\n    exit 1\n    ;;\nesac\n\n# Make sure the target directory is writable.\nif [ ! -w \"$TARGET\" ]; then\n    echo \"Target directory $TARGET is not writable.\"\n    echo \"Please run this script through 'sudo' to allow writing to $TARGET.\"\n    echo\n    echo \"If you're running this script from a terminal, you can do so using\"\n    echo \"  curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sudo sh\"\n    exit 1\nfi\n\n# Make sure we don't overwrite an existing installation.\nif [ -f \"$TARGET/databricks\" ]; then\n    echo \"Target path $TARGET/databricks already exists.\"\n    echo \"If you have an existing Databricks CLI installation, please first remove it using\"\n    echo \"  sudo rm '$TARGET/databricks'\"\n    exit 1\nfi\n\n# Change into temporary directory.\ntmpdir=\"$(mktemp -d)\"\ncd \"$tmpdir\"\n\n# Download release archive.\ncurl -L -s -O \"https://github.com/databricks/cli/releases/download/v${VERSION}/${FILE}.zip\"\n\n# Unzip release archive.\nunzip -q \"${FILE}.zip\"\n\n# Add databricks to path.\nchmod +x ./databricks\ncp ./databricks \"$TARGET\"\necho \"Installed $($TARGET/databricks -v) at $TARGET/databricks.\"\n\n# Clean up temporary directory.\ncd \"$OLDPWD\"\nrm -rf \"$tmpdir\" || true\"\"\"\n\noutput: str = subprocess.run([\"bash\", \"-c\", cli_install], capture_output=True, text=True)\n\nif output.stdout:\n\tprint(f\"CLI install STDOUT: {output.stdout}\")\nif output.stderr:\n\tprint(f\"CLI install STDERR: {output.stderr}\")\n\nfor var in json.loads(os.environ[\"env_vars\"]):\n\tif var[\"name\"].upper() == \"DATABRICKS_CLIENT_ID\":\n\t\tprint(f\"Setting DATABRICKS_CLIENT_ID to: '{var['value']}'\")\n\t\tos.environ[\"DATABRICKS_CLIENT_ID\"] = var[\"value\"]\n\telif var[\"name\"].upper() == \"GIT_USERNAME\":\n\t\tprint(f\"Setting GIT_USERNAME to: '{var['value']}'\")\n\t\tgit_username: str = var[\"value\"]\n\ncmd1=(subprocess.run([\"bash\", \"-c\", 'copado --progress \"fetching $promotion\"'], capture_output=True, text=True))\nif cmd1.stdout:\n\tprint(f\"Copado progress STDOUT: {cmd1.stdout}\")\nif cmd1.stderr:\n\tprint(f\"Copado progress STDERR: {cmd1.stderr}\")\ncmd2=(subprocess.run([\"bash\", \"-c\", 'copado-git-get \"$promotion\"'], capture_output=True, text=True))\nif cmd2.stdout:\n\tprint(f\"Copado git get STDOUT: {cmd2.stdout}\")\nif cmd2.stderr:\n\tprint(f\"Copado git get STDERR: {cmd2.stderr}\")\n\nrepos = subprocess.run([\"bash\", \"-c\", \"git remote -v\"], capture_output=True, text=True)\nif repos.stdout:\n\tprint(f\"Git remotes STDOUT: {repos.stdout}\")\nif repos.stderr:\n\tprint(f\"Git remotes STDERR: {repos.stderr}\")\ngit_provider: str = repos.stdout.split(\"@\")[-1].split(\".\")[0]\nprint(f\"Git provider: '{git_provider}'\")\nrepo_info: list = repos.stdout.split(\"/\")[-2].split(\" \")\nrepo_name: str = repo_info[0].rstrip(\".git\")\nprint(f\"Using repo: '{repo_name}'\")\nrepo_org: str = repo_info[-1].split(\":\")[-1]\nprint(f\"Repo organization name: '{repo_org}'\")\nfull_repo_name: str = f\"/Repos/{target_branch.upper()}/{repo_name}\"\nprint(f\"Full repo name is: '{full_repo_name}'\")\n\ngit_credentials = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks git-credentials list -t {target_branch}\"], capture_output=True, text=True)\n\nif git_credentials.stdout:\n\tprint(f\"Git-credentials list STDOUT: {git_credentials.stdout}\")\nif git_credentials.stderr:\n\tprint(f\"Git-credentials list STDERR: {git_credentials.stderr}\")\n\ncredentials: str = json.loads(git_credentials.stdout)\n\nif credentials:\n\tprint(f\"Git credentials already configured as: '{credentials}'. Continuing deployment...\")\nelse:\n\tcreate_git_credentials = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks git-credentials create {git_provider} --git-username {git_username} --personal-access-token {os.environ['GIT_TOKEN']} -t {target_branch}\"], capture_output=True, text=True)\n\tif create_git_credentials.stdout:\n\t\tprint(f\"Git-credentials create STDOUT: {create_git_credentials.stdout}\")\n\tif create_git_credentials.stderr:\n\t\tprint(f\"Git-credentials create STDERR: {create_git_credentials.stderr}\")\n\tnew_git_credentials = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks git-credentials list -t {target_branch}\"], capture_output=True, text=True)\n\tif new_git_credentials.stdout:\n\t\tprint(f\"Git-credentials new list STDOUT: {new_git_credentials.stdout}\")\n\tif new_git_credentials.stderr:\n\t\tprint(f\"Git-credentials new list STDERR: {new_git_credentials.stderr}\")\n\nrepo_files = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks workspace list /Repos -t {target_branch}\"], capture_output=True, text=True)\n\nif repo_files.stdout:\n\tprint(f\"Repo files in workspace: '{repo_files.stdout}'\")\nif repo_files.stderr:\n\tprint(f\"Repo files STDERR: '{repo_files.stderr}'\")\n\nsubdirectory: str = target_branch.upper()\nprint(f\"Checking for repo subdirectory: '{subdirectory}'...\")\nif f\"/Repo/{subdirectory}\" in repo_files.stdout:\n\tprint(f\"Directory: '{subdirectory}' already exists in repo files. Creating repo...\")\nelse:\n\tprint(f\"Repo directory: '{subdirectory}' does not exist in repo files. Creating now...\")\n\tcreate_directory = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks workspace mkdirs /Repos/{subdirectory} -t {target_branch}\"], capture_output=True, text=True)\n\tif create_directory.stdout:\n\t\tprint(f\"Create directory STDOUT: {create_directory.stdout}\")\n\tif create_directory.stderr:\n\t\tprint(f\"Create directory STDERR: {create_directory.stderr}\")\n\ndbx_repos: str = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks repos list -t {target_branch}\"], capture_output=True, text=True)\n\nif dbx_repos.stdout:\n\tprint(f\"Databricks repos list STDOUT: '{dbx_repos.stdout}'\")\nif dbx_repos.stderr:\n\tprint(f\"Databricks repos list STDERR: '{dbx_repos.stderr}'\")\n\nif full_repo_name in dbx_repos.stdout:\n\tprint(f\"Repo: '{full_repo_name}' found in list of existing Databricks repos. Updating repo...\")\n\tupdate_repo: str = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks repos update {full_repo_name} --branch {target_branch} -t {target_branch}\"], capture_output=True, text=True)\n\tif update_repo.stdout:\n\t\tprint(f\"Repo update STDOUT: {update_repo.stdout}\")\n\tif update_repo.stderr:\n\t\tprint(f\"Repo update STDERR: {update_repo.stderr}\")\nelse:\n\tprint(f\"Repo: '{full_repo_name}' not found in existing Databricks repo. Creating repo...\")\n\tcreate_repo: str = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks repos create https://github.com/{repo_org}/{repo_name}.git {git_provider} --path /Workspace/Repos/{target_branch.upper()}/{repo_name} -t {target_branch}\"], capture_output=True, text=True)\n\tif create_repo.stdout:\n\t\tprint(f\"Repo create STDOUT: {create_repo.stdout}\")\n\tif create_repo.stderr:\n\t\tprint(f\"Repo create STDERR: {create_repo.stderr}\")\n\tif target_branch != \"prod\":\n\t\tprint(f\"Updating new repo to use current target branch: '{target_branch}'...\")\n\t\tupdate_repo: str = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks repos update {full_repo_name} --branch {target_branch} -t {target_branch}\"], capture_output=True, text=True)\n\t\tif update_repo.stdout:\n\t\t\tprint(f\"Repo update STDOUT: {update_repo.stdout}\")\n\t\tif update_repo.stderr:\n\t\t\tprint(f\"Repo update STDERR: {update_repo.stderr}\")\n\ncmd3=(subprocess.run([\"bash\", \"-c\", 'copado-git-get --depth 100 \"$target_branch\"'], capture_output=True, text=True))\nif cmd3.stdout:\n\tprint(f\"Copado git get target STDERR: {cmd3.stderr}\")\nif cmd3.stderr:\n\tprint(f\"Copado git get target STDOUT: {cmd3.stdout}\")\n\ncmd4=(subprocess.run([\"bash\", \"-c\", 'git merge \"$promotion\"'], capture_output=True, text=True))\nif cmd4.stdout.strip():\n\tprint(f\"Git merge STDERR: {cmd4.stderr}\")\nif cmd4.stderr.strip():\n\tprint(f\"Git merge STDOUT: {cmd4.stdout}\")\ncmd5=(subprocess.run([\"bash\", \"-c\", 'git push origin \"$target_branch\"'], capture_output=True, text=True))\n\nvalidate_bundle: str = subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks bundle validate -t {target_branch}\"], capture_output=True, text=True)\n\nif validate_bundle.stdout:\n\tprint(f\"Bundle validate STDOUT: {validate_bundle.stdout}\")\nif validate_bundle.stderr:\n\tprint(f\"Bundle validate STDERR: {validate_bundle.stderr}\")\n\nbundle_deploy=(subprocess.run([\"bash\", \"-c\", f\"/tmp/databricks bundle deploy -t {target_branch}\"], capture_output=True, text=True))\n\nif bundle_deploy.stdout:\n\tprint(f\"Bundle deploy STDOUT: {bundle_deploy.stdout}\")\nif bundle_deploy.stderr:\n\tprint(f\"Bundle deploy STDERR: {bundle_deploy.stderr}\")",
+          "copado__Type__c": "Custom",
+          "copado__Worker_Size__c": "S",
+          "Id": "a0lan000000U8HtAAK",
+          "LastReferencedDate": "2024-05-08T01:52:59.000+0000",
+          "LastViewedDate": "2024-05-08T01:52:59.000+0000",
+          "Name": "Databricks Deploy"
+        }
+      ],
+      "ObjectType": "copado__Function__c"
+    }
+  ],
+  "blobsByUID": {}
+}
