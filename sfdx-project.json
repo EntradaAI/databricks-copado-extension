@@ -5,6 +5,11 @@
             "default": true,
             "package": "Databricks_SFDX",
             "versionName": "ver 0.1",
+            "dependencies": [
+                {
+                  "package": "Copado Deployer@22.0"
+                }
+              ],
             "versionNumber": "0.1.0.NEXT"
         }
     ],
@@ -13,6 +18,7 @@
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "54.0",
     "packageAliases": {
-        "Databricks_SFDX": "0Hoan00000006WrCAI"
+        "Databricks_SFDX": "0Hoan00000006WrCAI",
+        "Copado Deployer@22.0": "04t5p000001MLqS"
     }
 }
