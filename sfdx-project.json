@@ -7,10 +7,17 @@
             "versionName": "ver 0.1",
             "dependencies": [
                 {
-                  "package": "Copado Deployer@22.0"
+                    "package": "Copado Deployer@22.0"
                 }
-              ],
+            ],
             "versionNumber": "0.1.0.NEXT"
+        },
+        {
+            "path": "force-app",
+            "package": "Databricks_Extension_Bundle",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.NEXT",
+            "default": false
         }
     ],
     "name": "Sample Copado Extension",
@@ -19,6 +26,7 @@
     "sourceApiVersion": "54.0",
     "packageAliases": {
         "Databricks_SFDX": "0Hoan00000006WrCAI",
-        "Copado Deployer@22.0": "04t5p000001MLqS"
+        "Copado Deployer@22.0": "04t5p000001MLqS",
+        "Databricks_Extension_Bundle": "0Hoan00000006YTCAY"
     }
 }
