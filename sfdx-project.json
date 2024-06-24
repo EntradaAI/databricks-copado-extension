@@ -3,7 +3,7 @@
         {
             "path": "force-app",
             "default": true,
-            "package": "Databricks_SFDX",
+            "package": "Databricks_Extension_Bundle",
             "versionName": "ver 0.1",
             "dependencies": [
                 {
@@ -13,7 +13,7 @@
             "versionNumber": "0.1.0.NEXT"
         }
     ],
-    "name": "Sample Copado Extension",
+    "name": "Databricks Copado Extension",
     "namespace": "",
     "sfdcLoginUrl": "https://login.salesforce.com",
     "sourceApiVersion": "54.0",
