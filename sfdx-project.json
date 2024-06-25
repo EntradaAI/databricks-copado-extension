@@ -1,24 +1,25 @@
 {
-    "packageDirectories": [
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true,
+      "package": "Databricks_Extension_Bundle",
+      "versionName": "ver 0.1",
+      "dependencies": [
         {
-            "path": "force-app",
-            "default": true,
-            "package": "Databricks_Extension_Bundle",
-            "versionName": "ver 0.1",
-            "dependencies": [
-                {
-                    "package": "Copado Deployer@22.0"
-                }
-            ],
-            "versionNumber": "0.1.0.NEXT"
+          "package": "Copado Deployer@22.0"
         }
-    ],
-    "name": "Databricks Copado Extension",
-    "namespace": "",
-    "sfdcLoginUrl": "https://login.salesforce.com",
-    "sourceApiVersion": "54.0",
-    "packageAliases": {
-        "Databricks_Extension_Bundle": "0Hoan00000006YTCAY",
-        "Copado Deployer@22.0": "04t5p000001MLqS"
+      ],
+      "versionNumber": "0.1.0.NEXT"
     }
+  ],
+  "name": "Databricks Copado Extension",
+  "namespace": "",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "54.0",
+  "packageAliases": {
+    "Databricks_Extension_Bundle": "0Hoan00000006YTCAY",
+    "Copado Deployer@22.0": "04t5p000001MLqS",
+    "Databricks_Extension_Bundle@0.1.0-1-main": "04tan0000005lsjAAA"
+  }
 }
